@@ -1,0 +1,10 @@
+---
+- hosts: vbox
+  remote_user: root
+
+  tasks:
+  - name: prepare server for snort
+    yum:
+      name: tcpdump
+      state: latest
+
