@@ -3,8 +3,129 @@
   remote_user: root
 
   tasks:
-  - name: prepare server for snort
+  - name: Enable EPEL-Release
+    yum: 
+        name: 
+          - epel-release
+        state: latest
+        
+  - name: Get prerequisite software for snort
     yum:
-      name: tcpdump
-      state: latest
+        name:           
+          - tcpdump
+          - gcc 
+          - flex 
+          - bison 
+          - zlib 
+          - libpcap 
+          - pcre 
+          - libdnet 
+          - tcpdump
+        state: latest
+     
+  - name: Get prerequisite software for snort build process
+    yum:
+        name:           
+        - zlib-devel 
+        - libpcap-devel 
+        - pcre-devel 
+        - libdnet-devel 
+        - openssl-devel 
+        - libnghttp2-devel 
+        - luajit-devel
+        state: latest
+    
+  - name: Create temp folder, containing snort 
+    command: mkdir snort_src
+    args:
+        chdir: ~
+        
+  - name: Get daq source for installation
+    command: wget https://www.snort.org/downloads/snort/daq-2.0.6.tar.gz
+    args:
+        chdir: ~/snort_src
+        
+               
+  - name: Extract downloaded daq source
+    command: tar -xvzf daq-2.0.6.tar.gz
+    args:
+        chdir: ~/snort_src
+               
+               
+  - name: Create temp folder, containing snort 
+    command: ./configure && make && sudo make install
+    args:
+        chdir: ~/snort_src/daq-2.0.6
+        
+
+       
+  - name: Get snort source for installation
+    command: wget https://www.snort.org/downloads/snort/snort-2.9.13.tar.gz
+    args:
+        chdir: ~/snort_src
+        
+               
+  - name: Extract downloaded snort source
+    command: tar -xvzf snort-2.9.13.tar.gz
+    args:
+        chdir: ~/snort_src
+               
+               
+  - name: build snort
+    command: ./configure && make && sudo make install
+    args:
+        chdir: ~/snort_src/snort-2.9.13
+        
+  - name: create snort links
+    command: ln -s /usr/local/bin/snort /usr/sbin/snort
+        
+
+  - name: setup username and group
+    command: sudo groupadd snort && useradd snort -r -s /sbin/nologin -c SNORT_IDS -g snort
+        
+
+  - name: change folder permissions
+    command: > 
+    sudo chmod -R 5775 /etc/snort &&
+    sudo chmod -R 5775 /var/log/snort &&
+    sudo chmod -R 5775 /usr/local/lib/snort_dynamicrules &&
+    sudo chown -R snort{{":"}}snort /etc/snort &&
+    sudo chown -R snort{{":"}}snort /var/log/snort &&
+    sudo chown -R snort{{":"}}snort /usr/local/lib/snort_dynamicrules &&
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
