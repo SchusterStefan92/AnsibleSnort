@@ -168,7 +168,7 @@
   - name: "Copy rules"  
     copy:
         src: "{{ item }}"
-        dest: /etc/snort/
+        dest: /etc/snort/rules/
         owner: snort
         group: snort
         mode: 5775
