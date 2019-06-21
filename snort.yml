@@ -162,7 +162,7 @@
         group: snort
         mode: 5775
     with_fileglob:
-    - files/*
+    - files/snortconf/*
 
 
   - name: "Copy rules"  
@@ -174,5 +174,19 @@
         mode: 5775
     with_fileglob:
     - files/rules/*
+    
+    - name: "Copy snort deamon "  
+    copy:
+        src: files/snortd
+        dest: /etc/init.d
+        owner: root
+        group: root
+        mode: 700
 
+    - name: "Start and enable Snort Daemon"
+      systemd:
+        daemon_reload: yes
+        name: snortd
+        state: started
+        enabled: yes
 
