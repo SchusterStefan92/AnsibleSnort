@@ -3,10 +3,10 @@ filebeat.inputs:
   enabled: true
   paths:
     - /var/log/snort/*.csv
-    #- c:\programdata\elasticsearch\logs\*
+    
 
 output.logstash:
-  hosts: ["youresserver:5044"]
+  hosts: ["yourlogstashserver:5044"]
   ssl.certificate_authorities: ["/etc/filebeat/ca.crt"]
   ssl.certificate: "/etc/filebeat/filebeat_forwarder.crt"
   ssl.verification_mode: none
