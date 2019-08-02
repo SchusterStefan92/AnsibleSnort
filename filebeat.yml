@@ -1,0 +1,21 @@
+---
+- hosts: vbox
+  remote_user: root
+
+  tasks:
+  - name: Enable EPEL-Release
+    yum: 
+        name: 
+          - epel-release
+        state: latest
+      
+
+  - name: Download Filebeat RPM - Package
+    get_url:
+        url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.3.0-x86_64.rpm
+        dest: filebeat-7.3.0-x86_64.rpm
+        
+  - name: install local filebeat package
+    yum:
+        name: filebeat-7.3.0-x86_64.rpm
+        state: present

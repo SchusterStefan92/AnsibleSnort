@@ -162,7 +162,7 @@
         group: snort
         mode: 5775
     with_fileglob:
-    - files/snortconfig/*
+    - SnortFiles/snortconfig/*
 
 
   - name: "Copy rules"  
@@ -173,11 +173,11 @@
         group: snort
         mode: 5775
     with_fileglob:
-    - files/rules/*
+    - SnortFiles/rules/*
     
   - name: "Copy snort daemon config"  
     copy:
-        src: files/snortd
+        src: SnortFiles/snortd
         dest: /etc/init.d
         owner: root
         group: root
