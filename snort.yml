@@ -181,7 +181,7 @@
         dest: /etc/init.d
         owner: root
         group: root
-        mode: 700
+        mode: 755
 
   - name: "Start and enable Snort Daemon"
     systemd:
