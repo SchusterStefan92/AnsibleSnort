@@ -103,12 +103,12 @@
         dest: /usr/sbin/snort
         state: link
 
-  - name: Ensure group "somegroup" exists
+  - name: Ensure group "snort" exists
     group:
         name: snort
         state: present
   
-  - name: Add the user 'james' with a bash shell, appending the group 'admins' and 'developers' to the user's groups
+  - name: Add Snort User
     user:
         name: snort
         shell: /sbin/nologin
