@@ -73,7 +73,7 @@
       
   - name: Download and extract source code for snort
     unarchive:
-        src: https://www.snort.org/downloads/snort/snort-2.9.13.tar.gz
+        src: https://www.snort.org/downloads/snort/snort-2.9.14.1.tar.gz
         dest: ~/snort_src/
         remote_src: yes
 
@@ -81,16 +81,16 @@
   - name: configure snort
     command: ./configure 
     args:
-        chdir: ~/snort_src/snort-2.9.13
+        chdir: ~/snort_src/snort-2.9.14.1
     
     
   - name: Build snort
     make:
-      chdir: ~/snort_src/snort-2.9.13
+      chdir: ~/snort_src/snort-2.9.14.1
   
   - name: install snort
     make:
-      chdir: ~/snort_src/snort-2.9.13
+      chdir: ~/snort_src/snort-2.9.14.1
       target: install
       
         
@@ -154,7 +154,7 @@
         owner: snort
         group: snort
 
-  - name: "Copy config files"  
+  - name: "Copy snort config files"  
     copy:
         src: "{{ item }}"
         dest: /etc/snort/
@@ -162,7 +162,7 @@
         group: snort
         mode: 5775
     with_fileglob:
-    - files/snortconf/*
+    - files/snortconfig/*
 
 
   - name: "Copy rules"  
@@ -175,7 +175,7 @@
     with_fileglob:
     - files/rules/*
     
-  - name: "Copy snort deamon "  
+  - name: "Copy snort daemon config"  
     copy:
         src: files/snortd
         dest: /etc/init.d
