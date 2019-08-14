@@ -1,7 +1,7 @@
 ---
 - hosts: vbox
   vars:
-    logstashserver: yourserver
+    logstashserver: 127.0.0.1
   remote_user: root
 
   tasks:
@@ -15,21 +15,19 @@
   - name: Download Filebeat RPM - Package
     get_url:
         url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.3.0-x86_64.rpm
-        dest: filebeat-7.3.0-x86_64.rpm
+        dest: /root/filebeat-7.3.0-x86_64.rpm
         
   - name: install local filebeat package
     yum:
         name: filebeat-7.3.0-x86_64.rpm
         state: present
         
-  - name: "provide filebeat config files"  
-    copy:
-        src: "{{ item }}"
-        dest: /etc/filebeat/
-        mode: 5775
-    with_fileglob:
-    - FilebeatFiles/config/*
-
+        
+  - name: "create correct filebeat config with jinjer template"  
+    template: 
+        src: FilebeatFiles/config/filebeat.j2
+        dest: "/etc/filebeat/filebeat.yml"
+        mode: '755'
   
   - name: "copy filebeat ssl files"  
     copy:
@@ -38,6 +36,7 @@
         mode: 5775
     with_fileglob:
     - FilebeatFiles/ssl/*    
+
 
   - name: "Start and enable Filebeat"
     systemd:

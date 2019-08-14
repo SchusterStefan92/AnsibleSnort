@@ -2,11 +2,10 @@ filebeat.inputs:
 - type: log
   enabled: true
   paths:
-    - /var/log/snort/*.csv
-    
+    - /var/log/snort/*.csv    
 
 output.logstash:
-  hosts: ["yourlogstashserver:5044"]
+  hosts: ["{{ logstashserver }}:5044"]
   ssl.certificate_authorities: ["/etc/filebeat/ca.crt"]
   ssl.certificate: "/etc/filebeat/filebeat_forwarder.crt"
   ssl.verification_mode: none
