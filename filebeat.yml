@@ -1,5 +1,7 @@
 ---
 - hosts: vbox
+  vars:
+    logstashserver: yourserver
   remote_user: root
 
   tasks:
@@ -19,3 +21,27 @@
     yum:
         name: filebeat-7.3.0-x86_64.rpm
         state: present
+        
+  - name: "provide filebeat config files"  
+    copy:
+        src: "{{ item }}"
+        dest: /etc/filebeat/
+        mode: 5775
+    with_fileglob:
+    - FilebeatFiles/config/*
+
+  
+  - name: "copy filebeat ssl files"  
+    copy:
+        src: "{{ item }}"
+        dest: /etc/filebeat/
+        mode: 5775
+    with_fileglob:
+    - FilebeatFiles/ssl/*    
+
+  - name: "Start and enable Filebeat"
+    systemd:
+        daemon_reload: yes
+        name: filebeat
+        state: started
+        enabled: yes
