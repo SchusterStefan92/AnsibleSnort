@@ -1,1 +1,2 @@
-alert icmp any any -> $HOME_NET any (msg:"ICMP Alert!"; sid:10000001; rev:001;)
+alert icmp any any -> 192.168.0.0/16 any (msg:"ICMP traffic into homenet"; sid:10000003; rev:001;priority:3)
+alert tcp any 80 -> any any (msg:"outbound HTTP traffic"; sid:10000002; rev:004;priority:2)
