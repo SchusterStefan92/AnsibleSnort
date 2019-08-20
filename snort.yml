@@ -1,5 +1,7 @@
 ---
 - hosts: vbox
+  vars:
+    homenet: 192.168.0.0/16
   remote_user: root
 
   tasks:
@@ -49,7 +51,8 @@
   - name: Download and extract daq
     unarchive:
         src: https://www.snort.org/downloads/snort/daq-2.0.6.tar.gz
-        dest: ~/snort_src/
+        dest: ~/snort_src/        
+        validate_certs: false
         remote_src: yes
 
 
@@ -76,6 +79,7 @@
         src: https://www.snort.org/downloads/snort/snort-2.9.14.1.tar.gz
         dest: ~/snort_src/
         remote_src: yes
+        validate_certs: false
 
 
   - name: configure snort
@@ -163,6 +167,12 @@
         mode: 5775
     with_fileglob:
     - SnortFiles/snortconfig/*
+    
+  - name: "create correct snort config with jinjer template"  
+    template: 
+        src: SnortFiles/snort.j2
+        dest: "/etc/snort/snort.conf"
+        mode: '755'
 
 
   - name: "Copy rules"  
