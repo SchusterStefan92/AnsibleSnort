@@ -1,0 +1,34 @@
+# based on https://github.com/it-kombinat/ansible-ec2/blob/master/ec2-basic.yml
+---
+- name: Provision an EC2 Instance
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  tags: provisioning
+  # Necessary Variables for creating/provisioning the EC2 Instance
+  vars:
+    instance_type: t2.micro
+    security_group: cloud-presentation
+    image:  ami-06f2f779464715dc5 
+    keypair: cloud-presentation
+    region: us-west-2
+    count: 1
+    # Task that will be used to Launch/Create an EC2 Instance
+  tasks:   
+  - name: Launch the new EC2 Instance
+    local_action: ec2 
+                  group={{ security_group }} 
+                  instance_type={{ instance_type}} 
+                  image={{ image }} 
+                  wait=true 
+                  region={{ region }} 
+                  keypair={{ keypair }}
+                  count={{count}}
+    delegate_to: localhost
+    register: ec2
+  
+  - name: Add the newly created EC2 instance(s) to the local host group
+    add_host:
+        name: "{{ item.public_ip }}"
+        groups: aws
+    with_items: "{{ ec2.instances }}"

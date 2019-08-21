@@ -1,75 +1,62 @@
+
 ---
-- hosts: vbox
+- hosts: aws
   vars:
     # homenet: 192.168.0.0/16
     homenet: any
     ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.key
-    ansible_python_interpreter: /usr/bin/python2
-  remote_user: ec2-user
- 
+    ansible_python_interpreter: /usr/bin/python3
+  remote_user: ubuntu
+
   pre_tasks:
-  - name: 'install python2'
-    raw: sudo yum -y install python2
+  - name: 'install python3'
+    raw: sudo apt-get install python3
 
-    
+
   tasks:
-  - name: Enable EPEL-Release
-    yum: 
-        name: 
-          - epel-release
-        state: latest
-      
 
-      
-  - name: Get prerequisite software for snort
-    yum:
-        name:           
-          - tcpdump
-          - gcc 
-          - flex 
-          - bison 
-          - zlib 
-          - libpcap 
-          - pcre 
-          - libdnet 
-          - tcpdump
-          - wget
-        state: latest
-     
   - name: Get prerequisite software for snort build process
-    yum:
-        name:           
-        - zlib-devel 
-        - libpcap-devel 
-        - pcre-devel 
-        - libdnet-devel 
-        - openssl-devel 
-        - libnghttp2-devel 
-        - luajit-devel
-        - libpcap-devel
-
+    become: yes
+    become_user: root
+    become_method: sudo
+    apt:
+        name:
+        - gcc
+        - libpcre3-dev
+        - zlib1g-dev
+        - libluajit-5.1-dev
+        - libpcap-dev
+        - openssl
+        - libssl-dev
+        - libnghttp2-dev
+        - libdumbnet-dev
+        - bison
+        - flex
+        - libdnet
         state: latest
-    
+        update_cache: yes
+
+
   - name: Create temp folder for sourcecode of daq and snort
     file:
         path: ~/snort_src
         state: directory
-        
-        
+
+
   - name: Download and extract daq
     unarchive:
         src: https://www.snort.org/downloads/snort/daq-2.0.6.tar.gz
-        dest: ~/snort_src/        
+        dest: ~/snort_src/
         validate_certs: false
         remote_src: yes
 
 
   - name: configure daq
-    command: ./configure 
+    command: ./configure
     args:
-        chdir: ~/snort_src/daq-2.0.6 
-    
-    
+        chdir: ~/snort_src/daq-2.0.6
+
+
   - name: Build daq
     make:
       chdir: ~/snort_src/daq-2.0.6
@@ -79,9 +66,9 @@
     make:
       chdir: ~/snort_src/daq-2.0.6
       target: install
-      
-      
-      
+
+
+
   - name: Download and extract source code for snort
     unarchive:
         src: https://www.snort.org/downloads/snort/snort-2.9.14.1.tar.gz
@@ -91,21 +78,21 @@
 
 
   - name: configure snort
-    command: ./configure 
+    command: ./configure
     args:
         chdir: ~/snort_src/snort-2.9.14.1
-    
-    
+
+
   - name: Build snort
     make:
       chdir: ~/snort_src/snort-2.9.14.1
-  
+
   - name: install snort
     make:
       chdir: ~/snort_src/snort-2.9.14.1
       target: install
-      
-        
+
+
   #- name: create symbolic snort links
   #  command: ln -s /usr/local/bin/snort /usr/sbin/snort
 
@@ -119,7 +106,7 @@
     group:
         name: snort
         state: present
-  
+
   - name: Add Snort User
     user:
         name: snort
@@ -128,18 +115,18 @@
         system: yes
         comment: SNORT_IDS
         append: yes
-    
+
   - name: Create /etc/snort
     file:
-        path: /etc/snort  
+        path: /etc/snort
         state: directory
         recurse: yes
         mode: 5775
         owner: snort
         group: snort
-    
-     
-  - name: Create log folder 
+
+
+  - name: Create log folder
     file:
         path: /var/log/snort
         state: directory
@@ -147,7 +134,7 @@
         mode: 5775
         owner: snort
         group: snort
-     
+
   - name: create snort dynamic rules
     file:
         path: /usr/local/lib/snort_dynamicrules
@@ -166,7 +153,7 @@
         owner: snort
         group: snort
 
-  - name: "Copy snort config files"  
+  - name: "Copy snort config files"
     copy:
         src: "{{ item }}"
         dest: /etc/snort/
@@ -175,15 +162,15 @@
         mode: 5775
     with_fileglob:
     - SnortFiles/snortconfig/*
-    
-  - name: "create correct snort config with jinjer template"  
-    template: 
+
+  - name: "create correct snort config with jinjer template"
+    template:
         src: SnortFiles/snort.j2
         dest: "/etc/snort/snort.conf"
         mode: '755'
 
 
-  - name: "Copy rules"  
+  - name: "Copy rules"
     copy:
         src: "{{ item }}"
         dest: /etc/snort/rules/
@@ -192,8 +179,8 @@
         mode: 5775
     with_fileglob:
     - SnortFiles/rules/*
-    
-  - name: "Copy snort daemon config"  
+
+  - name: "Copy snort daemon config"
     copy:
         src: SnortFiles/snortd
         dest: /etc/init.d
@@ -207,4 +194,3 @@
         name: snortd
         state: started
         enabled: yes
-
