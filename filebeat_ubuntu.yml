@@ -1,0 +1,43 @@
+---
+- hosts: aws
+  vars:
+    logstashserver: 127.0.0.1
+    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.key
+    ansible_python_interpreter: /usr/bin/python3
+  remote_user: ubuntu
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  tasks:
+
+  - name: Download Filebeat RPM - Package
+    get_url:
+        url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.3.0-amd64.deb
+        dest: /root
+        
+  - name: install local filebeat package
+    apt: deb="/root/filebeat-7.3.0-amd64.deb"
+        
+        
+  - name: "create correct filebeat config with jinjer template"  
+    template: 
+        src: FilebeatFiles/config/filebeat.j2
+        dest: "/etc/filebeat/filebeat.yml"
+        mode: '755'
+  
+  - name: "copy filebeat ssl files"  
+    copy:
+        src: "{{ item }}"
+        dest: /etc/filebeat/
+        mode: 5775
+    with_fileglob:
+    - FilebeatFiles/ssl/*    
+
+
+  - name: "Start and enable Filebeat"
+    systemd:
+        daemon_reload: yes
+        name: filebeat
+        state: started
+        enabled: yes
