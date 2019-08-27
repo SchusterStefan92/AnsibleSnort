@@ -3,7 +3,7 @@
   vars:
     # homenet: 192.168.0.0/16
     homenet: any
-    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.key
+    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.pem
     ansible_python_interpreter: /usr/bin/python2
   remote_user: ec2-user
  

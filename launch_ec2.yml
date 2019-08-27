@@ -34,7 +34,8 @@
                   insertafter="[webserver]" line={{ item.public_ip }}
     with_items: "{{ ec2.instances }}"
   
-  # 
+# add_host only creates a copy of the host file in the memory for usage in this particular playbook, instead of
+# editing the /etc/ansible/hosts file
   
 #  - name: Add the newly created EC2 instance(s) to the local host group
 #    add_host:

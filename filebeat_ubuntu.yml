@@ -2,7 +2,7 @@
 - hosts: aws
   vars:
     logstashserver: 127.0.0.1
-    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.key
+    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.pem
     ansible_python_interpreter: /usr/bin/python3
   remote_user: ubuntu
   become: yes
@@ -11,7 +11,7 @@
 
   tasks:
 
-  - name: Download Filebeat RPM - Package
+  - name: Download Filebeat Package
     get_url:
         url: https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.3.0-amd64.deb
         dest: /root

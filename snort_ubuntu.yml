@@ -2,7 +2,7 @@
 - hosts: aws
   vars:
     homenet: 172.31.0.0/16
-    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.key
+    ansible_ssh_private_key_file: ~/.ssh/cloud-presentation.pem
     ansible_python_interpreter: /usr/bin/python3
   remote_user: ubuntu  
   become: yes
